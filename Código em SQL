@@ -1,0 +1,117 @@
+CREATE DATABASE GerenciamentoFinanceiro;
+
+USE GerenciamentoFinanceiro;
+
+CREATE TABLE Usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE Categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    tipo ENUM('receita', 'despesa') NOT NULL,
+    descricao TEXT
+);
+
+
+CREATE TABLE Contas (
+    id_conta INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    nome VARCHAR(255) NOT NULL,
+    tipo ENUM('corrente', 'poupança', 'cartão de crédito') NOT NULL,
+    saldo DECIMAL(10, 2) NOT NULL,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+
+CREATE TABLE Transacoes (
+    id_transacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    id_categoria INT,
+    id_conta INT,
+    valor DECIMAL(10, 2) NOT NULL,
+    data DATE NOT NULL,
+    descricao TEXT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria),
+    FOREIGN KEY (id_conta) REFERENCES Contas(id_conta)
+);
+
+
+CREATE TABLE Orçamentos (
+    id_orcamento INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    id_categoria INT,
+    valor DECIMAL(10, 2) NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria)
+);
+
+
+CREATE TABLE MetasFinanceiras (
+    id_meta INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    data_alvo DATE NOT NULL,
+    status ENUM('pendente', 'concluída', 'cancelada') NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+
+CREATE TABLE Relatorios (
+    id_relatorio INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    tipo ENUM('mensal', 'anual') NOT NULL,
+    descricao TEXT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+
+CREATE TABLE Notificacoes (
+    id_notificacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    mensagem TEXT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lida BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+CREATE TABLE InstituicoesFinanceiras (
+    id_instituicao INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    tipo ENUM('banco', 'cartão', 'financiadora') NOT NULL,
+    contato VARCHAR(255)
+);
+
+
+CREATE TABLE Rendimentos (
+    id_rendimento INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    data DATE NOT NULL,
+    tipo ENUM('juros', 'dividendos', 'aluguel') NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+
+CREATE TABLE DespesasRecorrentes (
+    id_despesa INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    id_categoria INT,
+    valor DECIMAL(10, 2) NOT NULL,
+    data_vencimento DATE NOT NULL,
+    descricao TEXT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria)
+);
